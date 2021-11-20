@@ -2,16 +2,26 @@ use std::{collections::HashMap};
 
 fn main() -> Result<(), std::io::Error> {
     let mut arguments =std::env::args().skip(1);
-    let key = arguments.next().unwrap();
+    let command = arguments.next().unwrap();
+    let key = arguments.next();
+    if key.is_none() {
+        println!("No key provided");
+        return Ok(());        
+    }
+    let key = key.unwrap();
     let mut db = Database::from_disk()?;
     let value = arguments.next();
-    if value.is_none() {
+    if command == "get" {
         db.retrieve(key)?;
-    } else {
+    } else if command == "set" && value.is_some() {
         let value = value.unwrap();
         db.insert(key, value);
         db.flush()?;
         drop(db);
+    } else if command == "set" && value.is_none() {
+        println!("Set commands must include a value argument");
+    } else {
+        println!("Unknown command: {}", command);
     }
     
     Ok(())
@@ -35,6 +45,7 @@ impl Database {
     }
 
     fn insert(&mut self, key: String, value: String) {
+        println!("Ok! I'll remember that {} is {}", key, value);
         self.hashmap.insert(key, value);
     }
 

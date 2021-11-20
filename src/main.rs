@@ -3,11 +3,17 @@ use std::{collections::HashMap};
 fn main() -> Result<(), std::io::Error> {
     let mut arguments =std::env::args().skip(1);
     let key = arguments.next().unwrap();
-    let value = arguments.next().unwrap();
     let mut db = Database::from_disk()?;
-    db.insert(key, value);
-    db.flush()?;
-    drop(db);
+    let value = arguments.next();
+    if value.is_none() {
+        db.retrieve(key)?;
+    } else {
+        let value = value.unwrap();
+        db.insert(key, value);
+        db.flush()?;
+        drop(db);
+    }
+    
     Ok(())
 }
 
@@ -40,5 +46,13 @@ impl Database {
         }
         let contents = contents.join("\n");
         std::fs::write("kv.db", contents)
+    }
+
+    fn retrieve(&self, key: String) -> Result<(), std::io::Error> {
+        match self.hashmap.get(&key) {
+            Some(value) => println!("{}", value),
+            None => println!("Key not found"),
+        }
+        Ok(())
     }
 }

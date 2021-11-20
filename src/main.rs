@@ -13,6 +13,10 @@ fn main() -> Result<(), std::io::Error> {
     let value = arguments.next();
     if command == "get" {
         db.retrieve(key)?;
+    } else if command == "del" || command == "delete" {
+        db.delete(key)?;
+        db.flush()?;
+        drop(db);
     } else if command == "set" && value.is_some() {
         let value = value.unwrap();
         db.insert(key, value);
@@ -62,6 +66,17 @@ impl Database {
     fn retrieve(&self, key: String) -> Result<(), std::io::Error> {
         match self.hashmap.get(&key) {
             Some(value) => println!("{}", value),
+            None => println!("Key not found"),
+        }
+        Ok(())
+    }
+
+    fn delete(&mut self, key: String) -> Result<(), std::io::Error> {
+        match self.hashmap.get(&key) {
+            Some(value) => {
+                println!("deleted {} {}", key, value);
+                self.hashmap.remove(&key);
+            },
             None => println!("Key not found"),
         }
         Ok(())

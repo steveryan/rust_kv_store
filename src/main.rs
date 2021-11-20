@@ -36,7 +36,7 @@ impl Database {
         let mut hashmap = HashMap::new();
         let contents = std::fs::read_to_string("kv.db")?;
         for line in contents.lines() {
-            let mut chunks = line.split("\t");
+            let mut chunks = line.split('\t');
             let key = chunks.next().unwrap();
             let value = chunks.next().unwrap();
             hashmap.insert(key.to_string(), value.to_string());

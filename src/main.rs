@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap};
 
 fn main() -> Result<(), std::io::Error> {
     let mut arguments =std::env::args().skip(1);
@@ -33,7 +33,12 @@ impl Database {
     }
 
     fn flush(&self) -> std::io::Result<()> {
-        let contents :String = todo!("implement this");
+        let mut contents: Vec<String> = Vec::new();
+        for (key, value) in self.hashmap.iter() {
+            let line = format!("{}\t{}", key, value);
+            contents.push(line);
+        }
+        let contents = contents.join("\n");
         std::fs::write("kv.db", contents)
     }
 }

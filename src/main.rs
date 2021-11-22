@@ -38,8 +38,11 @@ struct Database {
 impl Database {
     fn from_disk() -> Result<Database, std::io::Error> {
         let mut hashmap = HashMap::new();
-        let contents = std::fs::read_to_string("kv.db")?;
-        for line in contents.lines() {
+        let contents = std::fs::read_to_string("kv.db");
+        if contents.is_err() {
+            return Ok(Database { hashmap });
+        }
+        for line in contents.unwrap().lines() {
             let mut chunks = line.split('\t');
             let key = chunks.next().unwrap();
             let value = chunks.next().unwrap();
